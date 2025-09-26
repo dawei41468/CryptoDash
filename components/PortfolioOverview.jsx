@@ -1,22 +1,29 @@
 import { TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-const formatCurrency = (value) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2
-  }).format(value);
+import { formatCurrency, formatPercentage } from "@/lib/utils";
 
 export const PortfolioOverview = ({
   totalValue,
   totalChange,
   connectedExchanges,
-  totalAssets
+  totalAssets,
+  bestPerformer,
+  worstPerformer,
+  allocation
 }) => {
   const isPositive = totalChange >= 0;
   const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
+  const changeDisplay = formatPercentage(Math.abs(totalChange));
+  const bestPerformerLabel = bestPerformer
+    ? `${bestPerformer.name} (${bestPerformer.symbol})`
+    : "No assets tracked";
+  const worstPerformerLabel = worstPerformer
+    ? `${worstPerformer.name} (${worstPerformer.symbol})`
+    : "No assets tracked";
+  const allocationSummary = allocation?.length
+    ? allocation.map((item) => `${item.percentage}% ${item.symbol}`).join(" / ")
+    : "No tracked assets";
 
   return (
     <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -37,8 +44,8 @@ export const PortfolioOverview = ({
             <span className="text-muted-foreground">24h</span>
             <ChangeIcon className={isPositive ? "h-4 w-4 text-emerald-400" : "h-4 w-4 text-rose-400"} />
             <span className={isPositive ? "text-emerald-400" : "text-rose-400"}>
-              {isPositive ? "+" : ""}
-              {totalChange.toFixed(2)}%
+              {isPositive ? "+" : "-"}
+              {changeDisplay}%
             </span>
           </div>
         </CardHeader>
@@ -80,15 +87,15 @@ export const PortfolioOverview = ({
         <CardContent className="mt-auto space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-white/70">Best Performer</span>
-            <span className="text-sm font-semibold text-white">Solana (SOL)</span>
+            <span className="text-sm font-semibold text-white">{bestPerformerLabel}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-white/70">Worst Performer</span>
-            <span className="text-sm font-semibold text-white">Ethereum (ETH)</span>
+            <span className="text-sm font-semibold text-white">{worstPerformerLabel}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-white/70">Allocation</span>
-            <span className="text-sm font-semibold text-white">45% BTC / 32% ALT / 23% DeFi</span>
+            <span className="text-sm font-semibold text-white">{allocationSummary}</span>
           </div>
         </CardContent>
       </Card>

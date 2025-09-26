@@ -1,16 +1,11 @@
 import { Wallet, CheckCircle2, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-const formatCurrency = (value) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2
-  }).format(value);
+import { formatCurrency, formatPercentage } from "@/lib/utils";
 
 export const ExchangeCard = ({ exchange }) => {
   const isPositive = exchange.change24h >= 0;
+  const changeDisplay = formatPercentage(Math.abs(exchange.change24h));
 
   return (
     <Card className="flex flex-col bg-background/70">
@@ -41,8 +36,8 @@ export const ExchangeCard = ({ exchange }) => {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">24h Change</span>
           <span className={isPositive ? "text-emerald-400" : "text-rose-400"}>
-            {isPositive ? "+" : ""}
-            {exchange.change24h.toFixed(2)}%
+            {isPositive ? "+" : "-"}
+            {changeDisplay}%
           </span>
         </div>
         <div className="flex items-center justify-between text-sm text-muted-foreground">

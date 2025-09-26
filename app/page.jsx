@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { PortfolioOverview } from "@/components/PortfolioOverview";
 import { ExchangeCard } from "@/components/ExchangeCard";
 import { AssetList } from "@/components/AssetList";
+import { calculatePortfolioStats } from "@/lib/utils";
 
 const mockExchanges = [
   {
@@ -53,24 +54,14 @@ const mockAssets = [
 ];
 
 export default function HomePage() {
-  const { totalValue, totalChange } = useMemo(() => {
-    const totalBalance = mockAssets.reduce((acc, asset) => acc + asset.value, 0);
-    const change =
-      mockExchanges
-        .filter((exchange) => exchange.connected)
-        .reduce((acc, exchange) => acc + exchange.change24h, 0) /
-      Math.max(mockExchanges.filter((exchange) => exchange.connected).length, 1);
+  const { totalValue, weightedChange, bestPerformer, worstPerformer, allocation } =
+    useMemo(() => calculatePortfolioStats(mockAssets), []);
 
-    return {
-      totalValue: totalBalance,
-      totalChange: change
-    };
-  }, []);
-
-  const connectedCount = useMemo(
-    () => mockExchanges.filter((exchange) => exchange.connected).length,
+  const connectedExchanges = useMemo(
+    () => mockExchanges.filter((exchange) => exchange.connected),
     []
   );
+  const connectedCount = connectedExchanges.length;
 
   return (
     <div className="min-h-screen bg-background/60">
@@ -98,9 +89,12 @@ export default function HomePage() {
       <main className="container mx-auto space-y-8 px-4 py-8 sm:px-6">
         <PortfolioOverview
           totalValue={totalValue}
-          totalChange={totalChange}
+          totalChange={weightedChange}
           connectedExchanges={connectedCount}
           totalAssets={mockAssets.length}
+          bestPerformer={bestPerformer}
+          worstPerformer={worstPerformer}
+          allocation={allocation}
         />
 
         <section className="space-y-4">

@@ -1,12 +1,6 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
-
-const formatCurrency = (value) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2
-  }).format(value);
+import { formatCurrency, formatPercentage } from "@/lib/utils";
 
 export const AssetList = ({ assets }) => {
   return (
@@ -26,6 +20,7 @@ export const AssetList = ({ assets }) => {
             {assets.map((asset) => {
               const isPositive = asset.change24h >= 0;
               const ChangeIcon = isPositive ? TrendingUp : TrendingDown;
+              const changeDisplay = formatPercentage(Math.abs(asset.change24h));
               return (
                 <tr key={asset.symbol} className="text-sm">
                   <td className="px-4 py-3">
@@ -44,8 +39,8 @@ export const AssetList = ({ assets }) => {
                   <td className="px-4 py-3">
                     <div className={`flex items-center gap-2 ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>
                       <ChangeIcon className="h-4 w-4" />
-                      {isPositive ? "+" : ""}
-                      {asset.change24h.toFixed(2)}%
+                      {isPositive ? "+" : "-"}
+                      {changeDisplay}%
                     </div>
                   </td>
                   <td className="px-4 py-3 font-semibold text-white">{formatCurrency(asset.value)}</td>
